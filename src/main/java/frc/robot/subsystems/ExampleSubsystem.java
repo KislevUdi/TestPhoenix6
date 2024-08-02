@@ -86,9 +86,9 @@ public class ExampleSubsystem extends SubsystemBase {
     var e = table.add("Target Velocity",0.5).getEntry();
 //    DoubleTopic dt = NetworkTableInstance.getDefault().getDoubleTopic("Target Velocity");
 //    DoubleEntry e = dt.getEntry(0.5);
-    Command c = new StartEndCommand(()->setVelocity(e.getDouble(0.5)), ()->setPower(0), this);
+    Command c = (new StartEndCommand(()->setVelocity(e.getDouble(0.5)), ()->setPower(0), this)).withTimeout(3);
     table.add("Run",c);
-    SmartDashboard.putData(c);
+//    SmartDashboard.putData(c);
   }
 
    
