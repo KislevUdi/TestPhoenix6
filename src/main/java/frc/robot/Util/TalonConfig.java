@@ -14,26 +14,28 @@ public class TalonConfig {
     public boolean brake = true;
     public double motorRatio = 1;
     public boolean inverted = false;
-    public closeLoopParam pid = new closeLoopParam(0.1,0.01,0,0.2,0.12,0.1);
+    public closeLoopParam pid = new closeLoopParam(0.1,0.01,0,0.2,0.12,0.1,0);
     public double motionMagicAccel = 10;
     public double motionMagicVelocity = 1;
     public double motionMagicJerk = 10;
 
-    class closeLoopParam {
-        double kp;
+    class closeLoopParam { // calculate volts - not -1 to 1 !!!
+        double kp;  
         double ki;
         double kd;
         double ks;
         double kv;
         double ka;
+        double kg;
 
-        closeLoopParam(double kp, double ki, double kd, double ks, double kv, double ka) {
+        closeLoopParam(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
             this.ka = ka;
             this.kd = kd;
             this.ki = ki;
             this.kp = kp;
             this.ks = ks;
             this.kv = kv;
+            this.kg = kg;
         }
     }
 
@@ -72,8 +74,15 @@ public class TalonConfig {
         return this;
     }
 
-    public TalonConfig withPID(double kp, double ki, double kd, double ks, double kv, double ka) {
-        pid = new closeLoopParam(kp, ki, kd, ks, kv, ka);
+    public TalonConfig withPID(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
+        pid = new closeLoopParam(kp, ki, kd, ks, kv, ka, kg);
+        return this;
+    }
+
+    public TalonConfig withMotionMagic(double velocity, double acceleration, double jerk) {
+        motionMagicVelocity = velocity;
+        motionMagicAccel = acceleration;
+        motionMagicJerk = jerk;
         return this;
     }
 

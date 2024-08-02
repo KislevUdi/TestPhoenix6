@@ -1,6 +1,5 @@
 package frc.robot.Util;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -16,7 +15,7 @@ public class TalonMotor extends TalonFX {
   TalonConfig config;
   String name;
   TalonFXConfiguration cfg;
-VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
+  VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
   DutyCycleOut dutyCycle = new DutyCycleOut(0);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0).withSlot(0);
 
@@ -48,9 +47,10 @@ VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
     cfg.Slot0.kP = config.pid.kp;
     cfg.Slot0.kI = config.pid.ki;
     cfg.Slot0.kD = config.pid.kd;
-    cfg.Slot0.kS = config.pid.ks; // add 0.5 Volts
+    cfg.Slot0.kS = config.pid.ks; 
     cfg.Slot0.kV = config.pid.kv;
     cfg.Slot0.kA = config.pid.ka;
+    cfg.Slot0.kG = config.pid.kg;
 
     cfg.Voltage.PeakForwardVoltage = config.maxVolt;
     cfg.Voltage.PeakReverseVoltage = config.minVolt;
@@ -69,6 +69,7 @@ VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
     getPosition().setUpdateFrequency(200);
     getVelocity().setUpdateFrequency(200);
     getAcceleration().setUpdateFrequency(200);
+    getMotorVoltage().setUpdateFrequency(200);
 
   }
 
