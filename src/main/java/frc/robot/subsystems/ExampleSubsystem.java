@@ -10,9 +10,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.DoubleTopic;
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
@@ -83,9 +82,12 @@ public class ExampleSubsystem extends SubsystemBase {
   }
 
   private void addCommand() {
-    DoubleTopic dt = NetworkTableInstance.getDefault().getDoubleTopic("Target Velocity");
-    DoubleEntry e = dt.getEntry(0.5);
-    Command c = new StartEndCommand(()->setVelocity(e.get()), ()->setPower(0), this);
+    ShuffleboardTab table = Shuffleboard.getTab("Example");
+    var e = table.add("Target Velocity",0.5).getEntry();
+//    DoubleTopic dt = NetworkTableInstance.getDefault().getDoubleTopic("Target Velocity");
+//    DoubleEntry e = dt.getEntry(0.5);
+    Command c = new StartEndCommand(()->setVelocity(e.getDouble(0.5)), ()->setPower(0), this);
+    table.add("Run",c);
     SmartDashboard.putData(c);
   }
 
