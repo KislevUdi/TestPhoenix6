@@ -1,97 +1,46 @@
+
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.ForwardLimitValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.ReverseLimitValue;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Log.LogManager;
+import frc.robot.Util.TalonMotor;
 
 import static frc.robot.Constants.ExampleConstants.*;
-import static frc.robot.Utils.*;
+import static frc.robot.Util.Utils.*;
 
 
 public class ExampleSubsystem extends SubsystemBase {
 
-  TalonFX motor;
+  TalonMotor motor;
   VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
   DutyCycleOut dutyCycle = new DutyCycleOut(0);
+  MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
 
   public ExampleSubsystem() {
-    motor = new TalonFX(MOTOR_ID,CAN);
-    configMotor();
-    addLog();
+    motor = new TalonMotor(MOTOR_CONFIG);
     addCommand();
-  }
-
-  private void configMotor() {
-    TalonFXConfiguration cfg = new TalonFXConfiguration();
-
-    cfg.Feedback.RotorToSensorRatio = 4*0.0254*Math.PI/8.14;
-
-    cfg.CurrentLimits.SupplyCurrentLimit = 10;
-    cfg.CurrentLimits.SupplyCurrentThreshold = 12;
-    cfg.CurrentLimits.SupplyTimeThreshold = 0.2;
-    cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-
-    cfg.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.3;
-    cfg.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.3;
-
-    cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    cfg.MotorOutput.PeakForwardDutyCycle = 0.4;
-    cfg.MotorOutput.PeakReverseDutyCycle = -0.4;
-
-    cfg.Slot0.kP = KP;
-    cfg.Slot0.kI = KI;
-    cfg.Slot0.kD = KD;
-    cfg.Slot0.kS = KS; // add 0.5 Volts
-    cfg.Slot0.kV = KV; 
-    cfg.Slot0.kA = KA;
-
-    cfg.Voltage.PeakForwardVoltage = 5;
-    cfg.Voltage.PeakReverseVoltage = -5;
-
-    motor.getConfigurator().apply(cfg);
-  }
-
-  private void addLog() {
-    LogManager.addEntry("motor/position", motor::getPosition, false);
-    LogManager.addEntry("motor/Velocity", motor::getVelocity, true);
-    LogManager.addEntry("motor/Acceleration", motor::getAcceleration, true);
-    LogManager.addEntry("motor/Voltage", motor::getMotorVoltage, true);
-    LogManager.addEntry("motor/Current", motor::getStatorCurrent, true);
-    LogManager.addEntry("motor/CloseLoopError", motor::getClosedLoopError, true);
-    LogManager.addEntry("motor/CloseLoopOutput", motor::getClosedLoopOutput, true);
-    LogManager.addEntry("motor/CloseLoopP", motor::getClosedLoopProportionalOutput, true);
-    LogManager.addEntry("motor/CloseLoopI", motor::getClosedLoopIntegratedOutput, true);
-    LogManager.addEntry("motor/CloseLoopD", motor::getClosedLoopDerivativeOutput, true);
-    LogManager.addEntry("motor/CloseLoopFF", motor::getClosedLoopFeedForward, true);
-    LogManager.addEntry("motor/CloseLoopSP", motor::getClosedLoopReference, true);
   }
 
   private void addCommand() {
     ShuffleboardTab table = Shuffleboard.getTab("Example");
     var e = table.add("Target Velocity",0.5).getEntry();
-//    DoubleTopic dt = NetworkTableInstance.getDefault().getDoubleTopic("Target Velocity");
-//    DoubleEntry e = dt.getEntry(0.5);
+    var e2 = table.add("Target Position",1).getEntry();
     Command c = (new StartEndCommand(()->setVelocity(e.getDouble(0.5)), ()->setPower(0), this)).withTimeout(3);
-    table.add("Run",c);
-//    SmartDashboard.putData(c);
+    table.add("Run Velocity",c);
+    c = (new StartEndCommand(()->setPosition(e2.getDouble(0.5)), ()->setPower(0), this)).withTimeout(5);
+    table.add("Run Position",c);
   }
 
-   
   public double getPosition() {
     return motor.getPosition().getValue();
   }
@@ -143,11 +92,15 @@ public class ExampleSubsystem extends SubsystemBase {
     motor.setVoltage(volts);
   }
   public void setPower(double power) {
-    motor.setControl(dutyCycle.withOutput(power));
+    motor.setDuty(power);
   }
 
   public void setVelocity(double meterPerSec) {
-    motor.setControl(velocityVoltage.withVelocity(meterPerSec));
+    motor.setVelocity(meterPerSec);
+  }
+
+  public void setPosition(double position) {
+    motor.setMotorPosition(position);
   }
 
 

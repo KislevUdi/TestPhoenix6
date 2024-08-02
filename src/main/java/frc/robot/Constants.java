@@ -1,8 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
+
+import frc.robot.Util.TalonConfig;
 
 public final class Constants {
   public static class ExampleConstants {
@@ -11,18 +9,18 @@ public final class Constants {
     public static final double INCH = 0.0254;
     public static final double WHEEL_CIRC = 4 * INCH * Math.PI;
     public static final double GEAR_RATIO = 8.14;
-    public static final double MOTOR_RATIO = WHEEL_CIRC / GEAR_RATIO;
+    public static final double MOTOR_RATIO =  GEAR_RATIO / WHEEL_CIRC;
 
-    public static final double KP = 0.01;
-    public static final double KI = 0.001;
-    public static final double KD = 0.0;
-    public static final double KS = 0.5;
-    public static final double KV = 0.11 * MOTOR_RATIO;
-    public static final double KA = 0.01 * MOTOR_RATIO;
+    public static final TalonConfig MOTOR_CONFIG = new TalonConfig(MOTOR_ID, CAN, "motor")
+      .withBrake(false)
+      .withCurrent(10,12,0.2)
+      .withMotorRatio(MOTOR_RATIO)
+      .withPID(0.01,0.001,0,0.5,0.12,0.01)
+      .withVolts(5,-5);
   }
 
 
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
+    public static final int DriverControllerPort = 0;
   }
 }
