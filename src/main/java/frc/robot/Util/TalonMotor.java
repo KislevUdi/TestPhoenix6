@@ -63,8 +63,12 @@ VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
     cfg.MotionMagic.MotionMagicExpo_kV = config.pid.kv;
     velocityVoltage.Acceleration = config.motionMagicAccel;
 
+    
     getConfigurator().apply(cfg);
     setMotorPosition(0);
+    getPosition().setUpdateFrequency(200);
+    getVelocity().setUpdateFrequency(200);
+    getAcceleration().setUpdateFrequency(200);
 
   }
 
