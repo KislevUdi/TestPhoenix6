@@ -80,18 +80,18 @@ public class TalonMotor extends TalonFX {
   }
 
   private void addLog() {
-    LogManager.addEntry(name + "/position", this::getPosition, true);
-    LogManager.addEntry(name + "/Velocity", this::getVelocity, true);
-    LogManager.addEntry(name + "/Acceleration", this::getAcceleration, true);
-    LogManager.addEntry(name + "/Voltage", this::getMotorVoltage, true);
-    LogManager.addEntry(name + "/Current", this::getStatorCurrent, true);
-    LogManager.addEntry(name + "/CloseLoopError", this::getClosedLoopError, true);
-    LogManager.addEntry(name + "/CloseLoopOutput", this::getClosedLoopOutput, true);
-    LogManager.addEntry(name + "/CloseLoopP", this::getClosedLoopProportionalOutput, true);
-    LogManager.addEntry(name + "/CloseLoopI", this::getClosedLoopIntegratedOutput, true);
-    LogManager.addEntry(name + "/CloseLoopD", this::getClosedLoopDerivativeOutput, true);
-    LogManager.addEntry(name + "/CloseLoopFF", this::getClosedLoopFeedForward, true);
-    LogManager.addEntry(name + "/CloseLoopSP", this::getClosedLoopReference, true);
+    LogManager.addEntry(name + "/position", this::getPosition,null, true);
+    LogManager.addEntry(name + "/Velocity", this::getVelocity,null, true);
+    LogManager.addEntry(name + "/Acceleration", this::getAcceleration,null, true);
+    LogManager.addEntry(name + "/Voltage", this::getMotorVoltage,null, true);
+    LogManager.addEntry(name + "/Current", this::getStatorCurrent,null, true);
+    LogManager.addEntry(name + "/CloseLoopError", this::getClosedLoopError,null, true);
+    LogManager.addEntry(name + "/CloseLoopOutput", this::getClosedLoopOutput,null, true);
+    LogManager.addEntry(name + "/CloseLoopP", this::getClosedLoopProportionalOutput,null, true);
+    LogManager.addEntry(name + "/CloseLoopI", this::getClosedLoopIntegratedOutput,null, true);
+    LogManager.addEntry(name + "/CloseLoopD", this::getClosedLoopDerivativeOutput,null, true);
+    LogManager.addEntry(name + "/CloseLoopFF", this::getClosedLoopFeedForward,null, true);
+    LogManager.addEntry(name + "/CloseLoopSP", this::getClosedLoopReference,null, true);
   }
 
   public void setDuty(double power) {

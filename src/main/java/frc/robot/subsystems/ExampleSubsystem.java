@@ -26,6 +26,7 @@ public class ExampleSubsystem extends SubsystemBase {
   DutyCycleOut dutyCycle = new DutyCycleOut(0);
   MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
 
+
   public ExampleSubsystem() {
     motor = new TalonMotor(MOTOR_CONFIG);
     addCommand();
@@ -33,11 +34,11 @@ public class ExampleSubsystem extends SubsystemBase {
 
   private void addCommand() {
     ShuffleboardTab table = Shuffleboard.getTab("Example");
-    var e = table.add("Target Velocity",0.5).getEntry();
-    var e2 = table.add("Target Position",1).getEntry();
-    Command c = (new StartEndCommand(()->setVelocity(e.getDouble(0.5)), ()->setPower(0), this)).withTimeout(3);
+    var velocityEntry = table.add("Target Velocity",0.5).getEntry();
+    var positionEntry = table.add("Target Position",1).getEntry();
+    Command c = (new StartEndCommand(()->setVelocity(velocityEntry.getDouble(0.5)), ()->setPower(0), this)).withTimeout(3);
     table.add("Run Velocity",c);
-    c = (new StartEndCommand(()->setPosition(e2.getDouble(0.5)), ()->setPower(0), this)).withTimeout(5);
+    c = (new StartEndCommand(()->setPosition(positionEntry.getDouble(0.5)), ()->setPower(0), this)).withTimeout(5);
     table.add("Run Position",c);
   }
 
