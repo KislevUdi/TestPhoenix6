@@ -11,8 +11,9 @@ import com.ctre.phoenix6.signals.ReverseLimitValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Util.TalonMotor;
 
 import static frc.robot.Constants.ExampleConstants.*;
@@ -36,9 +37,13 @@ public class ExampleSubsystem extends SubsystemBase {
     ShuffleboardTab table = Shuffleboard.getTab("Example");
     var velocityEntry = table.add("Target Velocity",0.5).getEntry();
     var positionEntry = table.add("Target Position",1).getEntry();
-    Command c = (new StartEndCommand(()->setVelocity(velocityEntry.getDouble(0.5)), ()->setPower(0), this)).withTimeout(3);
+    Command c = new InstantCommand(()->setVelocity(velocityEntry.getDouble(0.5)),this)
+      .andThen(new WaitCommand(3)
+              ,new InstantCommand(()->setPower(0), this));
     table.add("Run Velocity",c);
-    c = (new StartEndCommand(()->setPosition(positionEntry.getDouble(0.5)), ()->setPower(0), this)).withTimeout(5);
+    c = new InstantCommand(()->setPosition(positionEntry.getDouble(2)),this)
+      .andThen(new WaitCommand(5)
+              ,new InstantCommand(()->setPower(0),this));
     table.add("Run Position",c);
   }
 
