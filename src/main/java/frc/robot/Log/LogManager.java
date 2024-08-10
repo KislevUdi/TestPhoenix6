@@ -3,6 +3,8 @@ package frc.robot.Log;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
+import javax.swing.LayoutStyle;
+
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 
@@ -26,26 +28,61 @@ public class LogManager extends SubsystemBase {
     private NetworkTable table = ntInst.getTable("log");
 
     /*
-      class for a single data entry
+     * class for a single data entry
      */
-    class LogEntry {
+    public class LogEntry {
         DoubleLogEntry entry;
         Supplier<StatusSignal<Double>> getterPhoenix6Status;
         Supplier<Double> getterDouble;
         String name;
         DoublePublisher ntPublisher;
+        double lastValue = Double.MAX_VALUE;
 
-        LogEntry(String name,Supplier<StatusSignal<Double>> getterPhoenix6Status,Supplier<Double> getterDouble, boolean addToNT) {
+        LogEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix6Status, Supplier<Double> getterDouble,
+                boolean addToNT) {
 
             this.entry = new DoubleLogEntry(log, name);
             this.getterPhoenix6Status = getterPhoenix6Status;
             this.getterDouble = getterDouble;
             this.name = name;
-            if(addToNT) {
+            if (addToNT) {
                 DoubleTopic dt = table.getDoubleTopic(name);
                 ntPublisher = dt.publish();
             } else {
                 ntPublisher = null;
+            }
+        }
+
+        public void publish() {
+            double v;
+            long time = 0;
+
+            if (getterPhoenix6Status != null) {
+                var st = getterPhoenix6Status.get();
+                if (st.getStatus() == StatusCode.OK) {
+                    v = st.getValue();
+                    time = (long) (st.getTimestamp().getTime() * 1000);
+                } else {
+                    v = lastValue;
+                }
+            } else {
+                v = getterDouble.get();
+                time = 0;
+            }
+            publish(v, time);
+        }
+
+        public void publish(double v) {
+            publish(v, 0);
+        }
+
+        public void publish(double v, long time) {
+            if (v != lastValue) {
+                entry.append(v, time);
+                if (ntPublisher != null) {
+                    ntPublisher.set(v);
+                }
+                lastValue = v;
             }
         }
     }
@@ -60,36 +97,29 @@ public class LogManager extends SubsystemBase {
         DriverStation.startDataLog(log);
     }
 
-    private void add(String name,Supplier<StatusSignal<Double>> getterPhoenix, Supplier<Double> getterDouble, boolean addToNT) { 
+    private void add(String name, Supplier<StatusSignal<Double>> getterPhoenix, Supplier<Double> getterDouble,
+            boolean addToNT) {
         logEntries.add(new LogEntry(name, getterPhoenix, getterDouble, addToNT));
     }
 
-    public static void addEntry(String name,Supplier<StatusSignal<Double>> getterPhoenix, Supplier<Double> getterDouble, boolean addToNT) {
-        logManager.add(name, getterPhoenix,getterDouble, addToNT);
+    private LogEntry get(String name, boolean addToNT) {
+        return new LogEntry(name, null, null, addToNT);
+    }
+
+    public static void addEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix,
+            Supplier<Double> getterDouble, boolean addToNT) {
+        logManager.add(name, getterPhoenix, getterDouble, addToNT);
+    }
+
+    public static LogEntry getEntry(String name, boolean addToNT) {
+        return logManager.get(name, addToNT);
     }
 
     @Override
     public void periodic() {
         super.periodic();
-        double v;
-        long time;
-        for(LogEntry e : logEntries) {
-            if(e.getterPhoenix6Status != null) {
-               var st = e.getterPhoenix6Status.get();
-                if(st.getStatus() == StatusCode.OK) {
-                    v = st.getValue();
-                    time = (long)(st.getTimestamp().getTime()*1000);
-                } else {
-                    continue;
-                }
-            } else {
-                v = e.getterDouble.get();
-                time = 0;
-            }
-            e.entry.append(v, time);
-            if(e.ntPublisher != null) {
-                e.ntPublisher.set(v);
-            }
+        for (LogEntry e : logEntries) {
+            e.publish();
         }
     }
 }

@@ -18,6 +18,9 @@ public class TalonMotor extends TalonFX {
   VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
   DutyCycleOut dutyCycle = new DutyCycleOut(0);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0).withSlot(0);
+  LogManager.LogEntry dutyCycleEntry;
+  LogManager.LogEntry velocityEntry;
+  LogManager.LogEntry positionEntry;
 
 
   public TalonMotor(TalonConfig config) {
@@ -92,17 +95,23 @@ public class TalonMotor extends TalonFX {
     LogManager.addEntry(name + "/CloseLoopD", this::getClosedLoopDerivativeOutput,null, true);
     LogManager.addEntry(name + "/CloseLoopFF", this::getClosedLoopFeedForward,null, true);
     LogManager.addEntry(name + "/CloseLoopSP", this::getClosedLoopReference,null, true);
+    dutyCycleEntry = LogManager.getEntry(name + "/setDutyCycle", true);
+    velocityEntry = LogManager.getEntry(name + "/setVelocity", true);
+    positionEntry = LogManager.getEntry(name + "/setPosition", true);
   }
 
   public void setDuty(double power) {
     setControl(dutyCycle.withOutput(power));
+    dutyCycleEntry.publish(power);
   }
   public void setVelocity(double velocity) {
     setControl(velocityVoltage.withVelocity(velocity));
+    velocityEntry.publish(velocity);
   }
 
-  public void setMotorPosition(double pos) {
-    setControl(motionMagicVoltage.withPosition(pos));
+  public void setMotorPosition(double position) {
+    setControl(motionMagicVoltage.withPosition(position));
+    positionEntry.publish(position);
   }
 
 }
