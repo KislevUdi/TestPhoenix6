@@ -102,16 +102,16 @@ public class TalonMotor extends TalonFX {
 
   public void setDuty(double power) {
     setControl(dutyCycle.withOutput(power));
-    dutyCycleEntry.publish(power);
+    dutyCycleEntry.log(power);
   }
   public void setVelocity(double velocity) {
     setControl(velocityVoltage.withVelocity(velocity));
-    velocityEntry.publish(velocity);
+    velocityEntry.log(velocity);
   }
 
   public void setMotorPosition(double position) {
     setControl(motionMagicVoltage.withPosition(position));
-    positionEntry.publish(position);
+    positionEntry.log(position);
   }
 
 }

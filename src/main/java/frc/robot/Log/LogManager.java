@@ -53,7 +53,7 @@ public class LogManager extends SubsystemBase {
             }
         }
 
-        public void publish() {
+        public void log() {
             double v;
             long time = 0;
 
@@ -69,14 +69,14 @@ public class LogManager extends SubsystemBase {
                 v = getterDouble.get();
                 time = 0;
             }
-            publish(v, time);
+            log(v, time);
         }
 
-        public void publish(double v) {
-            publish(v, 0);
+        public void log(double v) {
+            log(v, 0);
         }
 
-        public void publish(double v, long time) {
+        public void log(double v, long time) {
             if (v != lastValue) {
                 entry.append(v, time);
                 if (ntPublisher != null) {
@@ -119,7 +119,7 @@ public class LogManager extends SubsystemBase {
     public void periodic() {
         super.periodic();
         for (LogEntry e : logEntries) {
-            e.publish();
+            e.log();
         }
     }
 }
