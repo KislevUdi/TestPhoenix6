@@ -3,8 +3,6 @@ package frc.robot.Log;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
-import javax.swing.LayoutStyle;
-
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 
@@ -63,7 +61,7 @@ public class LogManager extends SubsystemBase {
                     v = st.getValue();
                     time = (long) (st.getTimestamp().getTime() * 1000);
                 } else {
-                    v = lastValue;
+                    v = -1000;
                 }
             } else {
                 v = getterDouble.get();
@@ -113,6 +111,10 @@ public class LogManager extends SubsystemBase {
 
     public static LogEntry getEntry(String name, boolean addToNT) {
         return logManager.get(name, addToNT);
+    }
+
+    public static void log(String message) {
+        DataLogManager.log(message);
     }
 
     @Override

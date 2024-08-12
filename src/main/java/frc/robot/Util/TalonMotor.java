@@ -1,5 +1,6 @@
 package frc.robot.Util;
 
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -29,6 +30,7 @@ public class TalonMotor extends TalonFX {
     name = config.name;
     configMotor();
     addLog();
+    LogManager.log(name + " motor initialized");
   }
 
   private void configMotor() {
@@ -113,5 +115,45 @@ public class TalonMotor extends TalonFX {
     setControl(motionMagicVoltage.withPosition(position));
     positionEntry.log(position);
   }
+
+  public double getCurrentPosition() {
+    return getTimePosition(0);
+  }
+  public double getCurrentVelocity() {
+    return getTimeVelocity(0);
+  }
+
+  public double getTimePosition(double time) {
+    if(time == 0) {
+        time = Utils.getCurrentTimeSeconds();
+    }
+    var p = getPosition();
+    double pTime = p.getTimestamp().getTime();
+    if(time < pTime) {
+        return p.getValue();
+    }
+    var v = getVelocity();
+    return p.getValue() + v.getValue()*(time-pTime);
+  }
+
+  public double getTimeVelocity(double time) {
+    if(time == 0) {
+        time = Utils.getCurrentTimeSeconds();
+    }
+    var v = getVelocity();
+    double vTime = v.getTimestamp().getTime();
+    if(time < vTime) {
+        return v.getValue();
+    }
+    var a = getAcceleration();
+    return v.getValue() + a.getValue()*(time-vTime);
+  }
+
+  // Questions
+  // Time from duty cicle set to actual volt change
+  // Time from velocity/magic set to actual moter change
+  // get a "timed" data for voltage/position/velocity/acceleration
+  // is acceleration valid
+
 
 }

@@ -12,6 +12,7 @@ public class RobotContainer {
     logManager = new LogManager();
     exampleSubsystem = new ExampleSubsystem();
     configureBindings();
+    LogManager.log("robot container initalized");
   }
 
   private void configureBindings() {
