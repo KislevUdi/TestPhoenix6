@@ -29,7 +29,7 @@ public final class Constants {
       new TalonConfig(STEER_MOTOR_ID, CANBUS, "steer motor")
       .withBrake(false)
       .withCurrent(10,12,0.2)
-      .withMotorRatio(DRIVE_MOTOR_RATIO)
+      .withMotorRatio(STEER_MOTOR_RATIO)
       .withPID(0.01,0.001,0,0.5,0.12,0.01,0)
       .withVolts(5,-5)
       .withInvert(false)

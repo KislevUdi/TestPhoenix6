@@ -28,9 +28,6 @@ public class ExampleSubsystem extends SubsystemBase {
 
   TalonMotor steerMotor;
   TalonMotor driveMotor;
-  VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
-  DutyCycleOut dutyCycle = new DutyCycleOut(0);
-  MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs();
 
   public ExampleSubsystem() {
     steerMotor = new TalonMotor(STEER_MOTOR_CONFIG);
@@ -87,8 +84,9 @@ public class ExampleSubsystem extends SubsystemBase {
    * @return double
    */
   public double getDriveVelocity() {
-    return steerMotor.getVelocity().getValue();
+    return driveMotor.getVelocity().getValue();
   }
+
 
   public void setSteerVoltage(double volts) {
     steerMotor.setVoltage(volts);
