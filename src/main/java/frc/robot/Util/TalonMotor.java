@@ -149,6 +149,10 @@ public class TalonMotor extends TalonFX {
     return v.getValue() + a.getValue()*(time-vTime);
   }
 
+  public String name() {
+    return name;
+  }
+
   // Questions
   // Time from duty cicle set to actual volt change
   // Time from velocity/magic set to actual moter change

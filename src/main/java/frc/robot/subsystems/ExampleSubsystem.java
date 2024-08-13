@@ -1,10 +1,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.MotionMagicConfigs;
-import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -42,6 +38,8 @@ public class ExampleSubsystem extends SubsystemBase {
     var drivePositionEntry = table.add("Target Drive Position", 1).getEntry();
     var steerVelocityEntry = table.add("Target Steer Velocity", 120).getEntry();
     var steerPositionEntry = table.add("Target Steer Position", 90).getEntry();
+    var drivePowerEntry = table.add("Drive Power'", 0.15).getEntry();
+    var steerPowerEntry = table.add("Drive Power'", 0.15).getEntry();
     Command c = getUserCommand(this::setDriveVelocity, driveVelocityEntry, 0.5, new WaitCommand(3), this::setDrivePower);
     table.add("Drive Velocity", c);
     c = getUserCommand(this::setDrivePosition, drivePositionEntry, 2, getTriggerCommand(this::getDrivePosition,drivePositionEntry,0.1,5), this::setDrivePower);
@@ -50,6 +48,10 @@ public class ExampleSubsystem extends SubsystemBase {
     table.add("Steer Velocity", c);
     c = getUserCommand(this::setSteerPosition, steerPositionEntry, 90, getTriggerCommand(this::getSteerPosition,steerPositionEntry,5,5), this::setSteerPower);
     table.add("Steer Position", c);
+    c = getUserCommand(this::setSteerPower, steerPowerEntry, 0.15, new WaitCommand(3), this::setSteerPowerAndReportVelocity);
+    table.add("Steer Power", c);
+    c = getUserCommand(this::setDrivePower, drivePowerEntry, 0.15, new WaitCommand(3), this::setDrivePowerAndReportVelocity);
+    table.add("Drive Power", c);
   }
 
 
@@ -100,6 +102,14 @@ public class ExampleSubsystem extends SubsystemBase {
   }
   public void setDrivePower(double power) {
     driveMotor.setDuty(power);
+  }
+  public void setDrivePowerAndReportVelocity(double power) {
+    LogManager.log(driveMotor.name() + " Velocity=" + getDriveVelocity());
+    setDrivePower(power);
+  }
+  public void setSteerPowerAndReportVelocity(double power) {
+    LogManager.log(steerMotor.name() + " Velocity=" + getSteerVelocity());
+    setSteerPower(power);
   }
 
   public void setSteerVelocity(double meterPerSec) {
