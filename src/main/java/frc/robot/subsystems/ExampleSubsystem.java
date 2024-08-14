@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Log.LogManager;
 import frc.robot.Util.TalonMotor;
+import frc.robot.commands.SysidAccelerationCommand;
 
 import static frc.robot.Constants.ExampleConstants.*;
 
@@ -52,6 +53,10 @@ public class ExampleSubsystem extends SubsystemBase {
     table.add("Steer Power", c);
     c = getUserCommand(this::setDrivePower, drivePowerEntry, 0.15, new WaitCommand(3), this::setDrivePowerAndReportVelocity);
     table.add("Drive Power", c);
+    c = new SysidAccelerationCommand(0.1, 0.4, 1, this::setDrivePower,this);
+    table.add("Sysid Drive", c);
+    c = new SysidAccelerationCommand(0.1, 0.4, 1, this::setSteerPower,this);
+    table.add("Sysid Steer", c);
   }
 
 
@@ -112,18 +117,21 @@ public class ExampleSubsystem extends SubsystemBase {
     setSteerPower(power);
   }
 
-  public void setSteerVelocity(double meterPerSec) {
-    steerMotor.setVelocity(meterPerSec);
+  public void setSteerVelocity(double degreesPerSec) {
+    steerMotor.setVelocity(degreesPerSec);
   }
   public void setDriveVelocity(double meterPerSec) {
     driveMotor.setVelocity(meterPerSec);
   }
 
-  public void setSteerPosition(double position) {
-    steerMotor.setMotorPosition(position);
+  public void setSteerPosition(double degrees) {
+    steerMotor.setMotorPosition(degrees);
   }
-  public void setDrivePosition(double position) {
-    driveMotor.setMotorPosition(position);
+  public void setDrivePosition(double positionInMeter) {
+    driveMotor.setMotorPosition(positionInMeter);
+  }
+  public void setRelativeDrivePosition(double positionInMeter) {
+    driveMotor.setMotorPosition(positionInMeter + driveMotor.getCurrentPosition());
   }
 
   @Override
