@@ -29,7 +29,7 @@ public class ExampleSubsystem extends SubsystemBase {
   public ExampleSubsystem() {
     steerMotor = new TalonMotor(STEER_MOTOR_CONFIG);
     driveMotor = new TalonMotor(DRIVE_MOTOR_CONFIG);
-    addCommand();
+    addCommands();
     LogManager.log("example subsystem initialized");
   }
 
@@ -38,30 +38,30 @@ public class ExampleSubsystem extends SubsystemBase {
    * Set velocity/position/power for bothy motors
    * Set Sysid for both motors
    */
-  private void addCommand() {
+  private void addCommands() {
     ShuffleboardTab table = Shuffleboard.getTab("Example");
     var driveVelocityEntry = table.add("Target Drive Velocity", 0.5).getEntry();
     var drivePositionEntry = table.add("Target Drive Position", 1).getEntry();
     var steerVelocityEntry = table.add("Target Steer Velocity", 120).getEntry();
     var steerPositionEntry = table.add("Target Steer Position", 90).getEntry();
     var drivePowerEntry = table.add("Drive Power'", 0.15).getEntry();
-    var steerPowerEntry = table.add("Drive Power'", 0.15).getEntry();
+    var steerPowerEntry = table.add("Steer Power'", 0.15).getEntry();
     Command c = getUserCommand(this::setDriveVelocity, driveVelocityEntry, 0.5, new WaitCommand(3), this::setDrivePower);
-    table.add("Drive Velocity", c);
+    table.add("Drive Velocity Command", c);
     c = getUserCommand(this::setDrivePosition, drivePositionEntry, 2, getTriggerCommand(this::getDrivePosition,drivePositionEntry,0.1,5), this::setDrivePower);
-    table.add("Drive Position", c);
+    table.add("Drive Position Command", c);
     c = getUserCommand(this::setSteerVelocity, steerVelocityEntry, 120, new WaitCommand(3), this::setSteerPower);
-    table.add("Steer Velocity", c);
+    table.add("Steer Velocity Command", c);
     c = getUserCommand(this::setSteerPosition, steerPositionEntry, 90, getTriggerCommand(this::getSteerPosition,steerPositionEntry,5,5), this::setSteerPower);
-    table.add("Steer Position", c);
+    table.add("Steer Position Command", c);
     c = getUserCommand(this::setSteerPower, steerPowerEntry, 0.15, new WaitCommand(3), this::setSteerPowerAndReportVelocity);
-    table.add("Steer Power", c);
+    table.add("Steer Power Command", c);
     c = getUserCommand(this::setDrivePower, drivePowerEntry, 0.15, new WaitCommand(3), this::setDrivePowerAndReportVelocity);
-    table.add("Drive Power", c);
+    table.add("Drive Power Command", c);
     c = new Sysid(driveMotor.name()).getCommand(this::setDrivePower,0.1, 0.4, 0.5, this);
-    table.add("Sysid Drive", c);
+    table.add("Sysid Drive Command", c);
     c = new Sysid(steerMotor.name()).getCommand(this::setSteerPower,0.1, 0.4, 0.5, this);
-    table.add("Sysid Steer", c);
+    table.add("Sysid Steer Command", c);
   }
 
 /**
@@ -70,11 +70,11 @@ public class ExampleSubsystem extends SubsystemBase {
  * wait command
  * set pwer to 0
  * 
- * @param set - set the motor (power, velocity or position)
- * @param entry - Network Table entry to read the value
+ * @param set - function to set the motor power, velocity or position
+ * @param entry - Network Table entry to read the value to set
  * @param defaultValue - default data - required for network table read
  * @param waitCommand - wait command before stopping motor
- * @param setStop - set power command - use to set power to 0
+ * @param setStop - function to set power 
  * @return
  */
   private Command getUserCommand(DoubleConsumer set, GenericEntry entry, double defaultValue, Command waitCommand, DoubleConsumer setStop) {
