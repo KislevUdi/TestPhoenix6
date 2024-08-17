@@ -10,8 +10,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Log.LogManager;
+import frc.robot.Sysid.Sysid;
 import frc.robot.Util.TalonMotor;
-import frc.robot.commands.SysidAccelerationCommand;
 
 import static frc.robot.Constants.ExampleConstants.*;
 
@@ -53,9 +53,9 @@ public class ExampleSubsystem extends SubsystemBase {
     table.add("Steer Power", c);
     c = getUserCommand(this::setDrivePower, drivePowerEntry, 0.15, new WaitCommand(3), this::setDrivePowerAndReportVelocity);
     table.add("Drive Power", c);
-    c = new SysidAccelerationCommand(0.1, 0.4, 1, this::setDrivePower,this);
+    c = new Sysid(driveMotor.name()).getCommand(this::setDrivePower,0.1, 0.4, 0.5, this);
     table.add("Sysid Drive", c);
-    c = new SysidAccelerationCommand(0.1, 0.4, 1, this::setSteerPower,this);
+    c = new Sysid(steerMotor.name()).getCommand(this::setSteerPower,0.1, 0.4, 0.5, this);
     table.add("Sysid Steer", c);
   }
 

@@ -85,21 +85,21 @@ public class TalonMotor extends TalonFX {
   }
 
   private void addLog() {
-    LogManager.addEntry(name + "/position", this::getPosition,null, true);
-    LogManager.addEntry(name + "/Velocity", this::getVelocity,null, true);
-    LogManager.addEntry(name + "/Acceleration", this::getAcceleration,null, true);
-    LogManager.addEntry(name + "/Voltage", this::getMotorVoltage,null, true);
-    LogManager.addEntry(name + "/Current", this::getStatorCurrent,null, true);
-    LogManager.addEntry(name + "/CloseLoopError", this::getClosedLoopError,null, true);
-    LogManager.addEntry(name + "/CloseLoopOutput", this::getClosedLoopOutput,null, true);
-    LogManager.addEntry(name + "/CloseLoopP", this::getClosedLoopProportionalOutput,null, true);
-    LogManager.addEntry(name + "/CloseLoopI", this::getClosedLoopIntegratedOutput,null, true);
-    LogManager.addEntry(name + "/CloseLoopD", this::getClosedLoopDerivativeOutput,null, true);
-    LogManager.addEntry(name + "/CloseLoopFF", this::getClosedLoopFeedForward,null, true);
-    LogManager.addEntry(name + "/CloseLoopSP", this::getClosedLoopReference,null, true);
-    dutyCycleEntry = LogManager.getEntry(name + "/setDutyCycle", true);
-    velocityEntry = LogManager.getEntry(name + "/setVelocity", true);
-    positionEntry = LogManager.getEntry(name + "/setPosition", true);
+    LogManager.addEntry(name + "/position", this::getPosition);
+    LogManager.addEntry(name + "/Velocity", this::getVelocity);
+    LogManager.addEntry(name + "/Acceleration", this::getAcceleration);
+    LogManager.addEntry(name + "/Voltage", this::getMotorVoltage);
+    LogManager.addEntry(name + "/Current", this::getStatorCurrent);
+    LogManager.addEntry(name + "/CloseLoopError", this::getClosedLoopError);
+    LogManager.addEntry(name + "/CloseLoopOutput", this::getClosedLoopOutput);
+    LogManager.addEntry(name + "/CloseLoopP", this::getClosedLoopProportionalOutput);
+    LogManager.addEntry(name + "/CloseLoopI", this::getClosedLoopIntegratedOutput);
+    LogManager.addEntry(name + "/CloseLoopD", this::getClosedLoopDerivativeOutput);
+    LogManager.addEntry(name + "/CloseLoopFF", this::getClosedLoopFeedForward);
+    LogManager.addEntry(name + "/CloseLoopSP", this::getClosedLoopReference);
+    dutyCycleEntry = LogManager.getEntry(name + "/setDutyCycle");
+    velocityEntry = LogManager.getEntry(name + "/setVelocity");
+    positionEntry = LogManager.getEntry(name + "/setPosition");
   }
 
   public void setDuty(double power) {
