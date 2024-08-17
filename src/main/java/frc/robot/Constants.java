@@ -10,9 +10,9 @@ public final class Constants {
     public static final double INCH = 0.0254;
     public static final double WHEEL_CIRC = 4 * INCH * Math.PI;
     public static final double DRIVE_GEAR_RATIO = 8.14;
-    public static final double DRIVE_MOTOR_RATIO =  DRIVE_GEAR_RATIO / WHEEL_CIRC;
+    public static final double DRIVE_MOTOR_RATIO =  DRIVE_GEAR_RATIO / WHEEL_CIRC; // motor rotaion to meter
     public static final double STEER_GEAR_RATIO = 12.8;
-    public static final double STEER_MOTOR_RATIO =  STEER_GEAR_RATIO / 360; 
+    public static final double STEER_MOTOR_RATIO =  STEER_GEAR_RATIO / 360; // steer rotation to degrees
 
     public static final TalonConfig DRIVE_MOTOR_CONFIG = 
       new TalonConfig(DRIVE_MOTOR_ID, CANBUS, "drive motor")

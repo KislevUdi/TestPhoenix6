@@ -153,11 +153,4 @@ public class TalonMotor extends TalonFX {
     return name;
   }
 
-  // Questions
-  // Time from duty cicle set to actual volt change
-  // Time from velocity/magic set to actual moter change
-  // get a "timed" data for voltage/position/velocity/acceleration
-  // is acceleration valid
-
-
 }
