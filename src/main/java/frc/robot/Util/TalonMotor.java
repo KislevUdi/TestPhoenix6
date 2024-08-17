@@ -139,10 +139,10 @@ public class TalonMotor extends TalonFX {
   }
 
   private double velocityFeedForward(double velocity) {
-    return velocity * velocity * Math.signum(velocity) * config.pid.kv2;
+    return velocity * velocity * Math.signum(velocity) * config.kv2;
   }
   private double positionFeedForward(double positin) {
-    return Math.sin(positin*config.pid.posToRad);
+    return Math.sin(positin*config.posToRad)*config.ksin;
   }
 
   public void setMotorPosition(double position, double feedForward) {

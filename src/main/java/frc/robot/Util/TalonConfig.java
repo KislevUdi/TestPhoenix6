@@ -23,6 +23,9 @@ public class TalonConfig {
     public double motionMagicAccel = 10; // maximum motion magic (position) acceleration
     public double motionMagicVelocity = 1; // maximum motition magic velocity
     public double motionMagicJerk = 10;    // maximum motion magic jerk
+    public double kv2 = 0;
+    public double ksin = 0;
+    public double posToRad = 0;
 
 
     /** 
@@ -36,9 +39,6 @@ public class TalonConfig {
         double kv;
         double ka;
         double kg;
-        double kv2 = 0;
-        double ksin = 0;
-        double posToRad = 0;
 
         closeLoopParam(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
             this.ka = ka;
@@ -132,9 +132,9 @@ public class TalonConfig {
      * @return TalonConfig
      */
     public TalonConfig withFeedForward(double kv2, double ksin, double posToRad) {
-        pid.kv2 = kv2;
-        pid.ksin = ksin;
-        pid.posToRad = posToRad;
+        this.kv2 = kv2;
+        this.ksin = ksin;
+        this.posToRad = posToRad;
         return this;
     }
 
