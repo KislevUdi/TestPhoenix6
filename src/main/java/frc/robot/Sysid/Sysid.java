@@ -5,9 +5,16 @@ import java.util.function.DoubleConsumer;
 
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.LinearQuadraticRegulator;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.Log.LogManager;
 import frc.robot.Log.LogManager.LogEntry;
 
@@ -167,8 +174,6 @@ public class Sysid {
         double kg = useKG? r.get(row++,0):0;
         double kvw = useKV2? r.get(row++,0):0;
         double ksin = useKSIN? r.get(row++,0):0;
-        double kp = 10*ka;
-        double ki = 2*kv;
         double kd = 0;
         SimpleMatrix caclulatedVolt = m.mult(res);
         SimpleMatrix errors = r.minus(caclulatedVolt);
@@ -181,15 +186,27 @@ public class Sysid {
         SimpleMatrix vels = m.getColumn(1);
         double minVel = vels.elementMin();
         double maxVel = vels.elementMax();
+        Pair<Double,Double> kpi = calculatePID(kv, ka, maxVel-minVel);
+        double kp = kpi.getFirst();
+        double ki = kpi.getSecond();
         log(minVel, maxVel,ks, kv, ka, kg, kvw, ksin, kp, ki, kd, maxError, avgError, avgErrorSquared);
         if(splitIfNeeded && (maxError > 0.1 || avgErrorSquared > 0.01)) {
             double range = maxVel - minVel;
             calculateForRange(minVel, minVel + 0.2*range, false);
             calculateForRange(minVel + 0.2*range, minVel + 0.6*range, false);
             calculateForRange(minVel + 0.6*range, maxVel, false);
-
         }
+    }
 
+    private Pair<Double,Double> calculatePID(double kv, double ka, double velRange) {
+        if(ka < 1E-7) {
+            return new Pair<Double,Double>(ka*10,kv/2);
+        }
+        var sys = LinearSystemId.identifyVelocitySystem(kv, ka);
+        var lqr = new LinearQuadraticRegulator<>(sys, VecBuilder.fill(velRange*0.1),VecBuilder.fill(8),Robot.kDefaultPeriod);
+        lqr.latencyCompensate(sys, Robot.kDefaultPeriod, Robot.kDefaultPeriod-0.01);
+        var k = lqr.getK();
+        return new Pair<Double,Double>(k.get(0, 0), k.get(0,1));
     }
 
     private void fillMatrix(SimpleMatrix mat, SimpleMatrix r, int row, timedData d) {

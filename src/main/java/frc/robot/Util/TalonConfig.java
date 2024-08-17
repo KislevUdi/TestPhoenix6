@@ -18,6 +18,8 @@ public class TalonConfig {
     public double motorRatio = 1;   // motor to mechanism ratio
     public boolean inverted = false; // if to invert motor
     public closeLoopParam pid = new closeLoopParam(0.1,0.01,0,0.2,0.12,0.1,0); // close loop argument - PID + FF
+    public closeLoopParam pid1 = null; // pid for slot 1
+    public closeLoopParam pid2 = null; // pid for slot 2
     public double motionMagicAccel = 10; // maximum motion magic (position) acceleration
     public double motionMagicVelocity = 1; // maximum motition magic velocity
     public double motionMagicJerk = 10;    // maximum motion magic jerk
@@ -34,6 +36,9 @@ public class TalonConfig {
         double kv;
         double ka;
         double kg;
+        double kv2 = 0;
+        double ksin = 0;
+        double posToRad = 0;
 
         closeLoopParam(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
             this.ka = ka;
@@ -121,6 +126,19 @@ public class TalonConfig {
     }
 
     /** 
+     * @param kv2
+     * @param ksin
+     * @param posToRad
+     * @return TalonConfig
+     */
+    public TalonConfig withFeedForward(double kv2, double ksin, double posToRad) {
+        pid.kv2 = kv2;
+        pid.ksin = ksin;
+        pid.posToRad = posToRad;
+        return this;
+    }
+
+    /** 
      * @param kp
      * @param ki
      * @param kd
@@ -133,6 +151,34 @@ public class TalonConfig {
         return this;
     }
 
+
+
+    /** 
+     * @param kp
+     * @param ki
+     * @param kd
+     * @param ks
+     * @param kv
+     * @return TalonConfig
+     */
+    public TalonConfig withPID1(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
+        pid1 = new closeLoopParam(kp, ki, kd, ks, kv, ka, kg);
+        return this;
+    }
+
+    /** 
+     * @param kp
+     * @param ki
+     * @param kd
+     * @param ks
+     * @param kv
+     * @return TalonConfig
+     */
+    public TalonConfig withPID2(double kp, double ki, double kd, double ks, double kv, double ka, double kg) {
+        pid2 = new closeLoopParam(kp, ki, kd, ks, kv, ka, kg);
+        return this;
+    }    
+    
     /** 
      * @param velocity
      * @param acceleration

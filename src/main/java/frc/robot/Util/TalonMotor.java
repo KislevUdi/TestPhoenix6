@@ -56,6 +56,24 @@ public class TalonMotor extends TalonFX {
     cfg.Slot0.kV = config.pid.kv;
     cfg.Slot0.kA = config.pid.ka;
     cfg.Slot0.kG = config.pid.kg;
+    if(config.pid1 != null) {
+      cfg.Slot1.kP = config.pid1.kp;
+      cfg.Slot1.kI = config.pid1.ki;
+      cfg.Slot1.kD = config.pid1.kd;
+      cfg.Slot1.kS = config.pid1.ks; 
+      cfg.Slot1.kV = config.pid1.kv;
+      cfg.Slot1.kA = config.pid1.ka;
+      cfg.Slot1.kG = config.pid1.kg;
+    }
+    if(config.pid2 != null) {
+      cfg.Slot2.kP = config.pid2.kp;
+      cfg.Slot2.kI = config.pid2.ki;
+      cfg.Slot2.kD = config.pid2.kd;
+      cfg.Slot2.kS = config.pid2.ks; 
+      cfg.Slot2.kV = config.pid2.kv;
+      cfg.Slot2.kA = config.pid2.ka;
+      cfg.Slot2.kG = config.pid2.kg;
+    }
 
     cfg.Voltage.PeakForwardVoltage = config.maxVolt;
     cfg.Voltage.PeakReverseVoltage = config.minVolt;
@@ -66,8 +84,11 @@ public class TalonMotor extends TalonFX {
     cfg.MotionMagic.MotionMagicJerk = config.motionMagicJerk;
     cfg.MotionMagic.MotionMagicExpo_kA = config.pid.ka;
     cfg.MotionMagic.MotionMagicExpo_kV = config.pid.kv;
-    velocityVoltage.Acceleration = config.motionMagicAccel;
 
+    velocityVoltage.Acceleration = config.motionMagicAccel;
+    velocityVoltage.UpdateFreqHz = 200;
+    dutyCycle.UpdateFreqHz = 200;
+    motionMagicVoltage.UpdateFreqHz = 200;
     
     getConfigurator().apply(cfg);
     setMotorPosition(0);
@@ -106,14 +127,33 @@ public class TalonMotor extends TalonFX {
     setControl(dutyCycle.withOutput(power));
     dutyCycleEntry.log(power);
   }
-  public void setVelocity(double velocity) {
-    setControl(velocityVoltage.withVelocity(velocity));
+  public void setVelocity(double velocity, double feedForward) {
+    setControl(velocityVoltage.withVelocity(velocity).withFeedForward(feedForward));
     velocityEntry.log(velocity);
   }
+  public void setVelocity(double velocity) {
+    setVelocity(velocity,0);
+  }
+  public void setVelocityWithFeedForward(double velocity) {
+    setVelocity(velocity,velocityFeedForward(velocity));
+  }
 
-  public void setMotorPosition(double position) {
-    setControl(motionMagicVoltage.withPosition(position));
+  private double velocityFeedForward(double velocity) {
+    return velocity * velocity * Math.signum(velocity) * config.pid.kv2;
+  }
+  private double positionFeedForward(double positin) {
+    return Math.sin(positin*config.pid.posToRad);
+  }
+
+  public void setMotorPosition(double position, double feedForward) {
+    setControl(motionMagicVoltage.withPosition(position).withFeedForward(feedForward));
     positionEntry.log(position);
+  }
+  public void setMotorPosition(double position) {
+    setMotorPosition(position, 0);
+  }
+  public void setMotorPositionWithFeedForward(double position) {
+    setMotorPosition(position, positionFeedForward(position));
   }
 
   public double getCurrentPosition() {
