@@ -79,6 +79,7 @@ public class TalonMotor extends TalonFX {
     cfg.Voltage.PeakReverseVoltage = config.minVolt;
 
     cfg.Feedback.SensorToMechanismRatio = config.motorRatio;
+    cfg.Feedback.FeedbackRotorOffset = -getRotorPosition().getValue();
     cfg.MotionMagic.MotionMagicAcceleration = config.motionMagicAccel;
     cfg.MotionMagic.MotionMagicCruiseVelocity = config.motionMagicVelocity;
     cfg.MotionMagic.MotionMagicJerk = config.motionMagicJerk;
@@ -89,14 +90,11 @@ public class TalonMotor extends TalonFX {
     velocityVoltage.UpdateFreqHz = 200;
     dutyCycle.UpdateFreqHz = 200;
     motionMagicVoltage.UpdateFreqHz = 200;
-    
     getConfigurator().apply(cfg);
-    setMotorPosition(0);
     getPosition().setUpdateFrequency(200);
     getVelocity().setUpdateFrequency(200);
     getAcceleration().setUpdateFrequency(200);
     getMotorVoltage().setUpdateFrequency(200);
-
   }
 
   public void setBrake(boolean brake) {

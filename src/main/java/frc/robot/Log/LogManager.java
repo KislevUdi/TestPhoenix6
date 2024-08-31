@@ -16,6 +16,7 @@ import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
@@ -206,6 +207,40 @@ public class LogManager extends SubsystemBase {
      */
     public static void log(String message) {
         DataLogManager.log(message);
+    }
+
+    /**
+     * Get an array of entries - all under a base name
+     * @param baseName
+     * @param names
+     * @return
+     */
+    public static LogEntry[] getLogEntries(String baseName, String...names) {
+        LogEntry[] entries = new LogEntry[names.length];
+        for(int i = 0; i < names.length; i++) {
+            entries[i] = getEntry(baseName + "/" + names[i]);
+        }
+        return entries;
+    }
+
+    /**
+     * Log values for an array of entries
+     * @param entries
+     * @param time
+     * @param values
+     */
+    public static void log(LogEntry[] entries, long time, double...values) {
+        for(int i = 0; i < entries.length; i++) {
+            entries[i].log(values[i], time);
+        }
+    }
+    /**
+     * Log values for an array of entries - using current time
+     * @param entries
+     * @param values
+     */
+    public static void log(LogEntry[] entries, double...values) {
+        log(entries,(long)(Timer.getFPGATimestamp()*1000),values);
     }
 
     @Override
