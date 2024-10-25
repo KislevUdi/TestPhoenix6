@@ -16,6 +16,7 @@ public class TalonMotor extends TalonFX {
   TalonConfig config;
   String name;
   TalonFXConfiguration cfg;
+  
   VelocityVoltage velocityVoltage = new VelocityVoltage(0).withSlot(0);
   DutyCycleOut dutyCycle = new DutyCycleOut(0);
   MotionMagicVoltage motionMagicVoltage = new MotionMagicVoltage(0).withSlot(0);

@@ -22,9 +22,9 @@ public class RobotContainer {
   private void configureBindings() {
   }
 
-  Translation2d vel = new Translation2d();
-  Translation2d pos = new Translation2d();
-  BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
+  public Translation2d vel = new Translation2d();
+  public Translation2d pos = new Translation2d();
+  public BuiltInAccelerometer accelerometer = new BuiltInAccelerometer();
   LogEntry[] logEntries = LogManager.getLogEntries("accel","ax","ay","az","vx","vy","px","py");
   double lastTime = 0;
   public void specialPeriodic() {

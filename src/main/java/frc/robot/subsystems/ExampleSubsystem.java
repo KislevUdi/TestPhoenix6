@@ -1,6 +1,8 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -10,6 +12,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Log.LogManager;
+import frc.robot.Log.LoggedChassisSpeeds;
+import frc.robot.Log.LoggedPose2d;
 import frc.robot.Sysid.Sysid;
 import frc.robot.Util.TalonMotor;
 
@@ -17,6 +21,7 @@ import static frc.robot.Constants.ExampleConstants.*;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+
 
   /** 
    * Example subsystem with 2 motors
@@ -26,9 +31,15 @@ public class ExampleSubsystem extends SubsystemBase {
   TalonMotor steerMotor;
   TalonMotor driveMotor;
 
+  LoggedChassisSpeeds speed;
+  LoggedPose2d pose;
+
+
   public ExampleSubsystem() {
     steerMotor = new TalonMotor(STEER_MOTOR_CONFIG);
     driveMotor = new TalonMotor(DRIVE_MOTOR_CONFIG);
+    speed = new LoggedChassisSpeeds("TestSpeeds", 0,0,0);
+    pose = new LoggedPose2d("testPose");
     addCommands();
     LogManager.log("example subsystem initialized");
   }
@@ -210,6 +221,9 @@ public class ExampleSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    speed.set(new ChassisSpeeds());
+    pose.set(new Pose2d());
+
   }
 
   @Override
