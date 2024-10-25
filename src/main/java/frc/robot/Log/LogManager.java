@@ -25,6 +25,8 @@ public class LogManager extends SubsystemBase {
 
     public static LogManager logManager; // singelton reference
 
+    public static int logLevel = 0;
+
     private DataLog log; //
     private NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     private NetworkTable table = ntInst.getTable("log");
@@ -32,7 +34,8 @@ public class LogManager extends SubsystemBase {
     /*
      * class for a single data entry
      */
-    public class LogEntry {
+    public static class LogEntry {
+        static LogManager manager;
         DoubleLogEntry entry;  // wpilib log entry
         Supplier<StatusSignal<Double>> getterPhoenix6Status; // supplier of phoenix 6 status signal
         DoubleSupplier getterDouble; // supplier for double data - if no status signal provider
@@ -40,23 +43,38 @@ public class LogManager extends SubsystemBase {
         String name;
         DoublePublisher ntPublisher;   // network table punlisher
         double lastValue = Double.MAX_VALUE; // last value - only logging when value changes
+        int level = 1;
+        boolean skipAutoLog = false;
 
         /*
          * Constructor with the suppliers and boolean if add to network table
          */
         LogEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix6Status, DoubleSupplier getterDouble,
-                boolean addToNT) {
-
-            this.entry = new DoubleLogEntry(log, name);
+                boolean addToNT, int level) {
+            this.entry = new DoubleLogEntry(manager.log, name);
             this.getterPhoenix6Status = getterPhoenix6Status;
             this.getterDouble = getterDouble;
             this.name = name;
             if (addToNT) {
-                DoubleTopic dt = table.getDoubleTopic(name);
+                DoubleTopic dt = manager.table.getDoubleTopic(name);
                 ntPublisher = dt.publish();
             } else {
                 ntPublisher = null;
             }
+            skipAutoLog = getterPhoenix6Status == null && getterDouble == null;
+            this.level = level;
+        }
+        LogEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix6Status, boolean addToNT, int level) {
+            this(name, getterPhoenix6Status, null, addToNT, level);
+        }
+        LogEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix6Status) {
+            this(name, getterPhoenix6Status, null, true, 5);
+        }
+        LogEntry(String name, DoubleSupplier getterDouble,boolean addToNT, int level) {
+            this(name, null, getterDouble, addToNT, level);
+        }
+        LogEntry(String name, DoubleSupplier getterDouble) {
+            this(name, null, getterDouble, true, 5);
         }
 
         /*
@@ -64,6 +82,9 @@ public class LogManager extends SubsystemBase {
          * get the data from the getters and call the actual log
          */
         void log() {
+            if(skipAutoLog || level < logLevel)
+                return;
+
             double v;
             long time = 0;
 
@@ -111,6 +132,10 @@ public class LogManager extends SubsystemBase {
         public void setConsumer(BiConsumer<Double,Long> consumer) {
             this.consumer = consumer;
         }
+
+        public void setLevel(int level) {
+            this.level = level;
+        }
     }
 
     // array of log entries
@@ -119,6 +144,7 @@ public class LogManager extends SubsystemBase {
     // Log managerconstructor
     public LogManager() {
         logManager = this;
+        LogEntry.manager = this;
         DataLogManager.start();
         DataLogManager.logNetworkTables(false);
         log = DataLogManager.getLog();
@@ -129,8 +155,8 @@ public class LogManager extends SubsystemBase {
      * add a log entry with all data
      */
     private LogEntry add(String name, Supplier<StatusSignal<Double>> getterPhoenix, DoubleSupplier getterDouble,
-            boolean addToNT) {
-        LogEntry entry = new LogEntry(name, getterPhoenix, getterDouble, addToNT);
+            boolean addToNT, int level) {
+        LogEntry entry = new LogEntry(name, getterPhoenix, getterDouble, addToNT, level);
         logEntries.add(entry);
         return entry;
     }
@@ -143,7 +169,7 @@ public class LogManager extends SubsystemBase {
         if(e != null) {
             return e;
         }
-        return new LogEntry(name, null, null, addToNT);
+        return new LogEntry(name, null, null, addToNT,5);
     }
 
     /*
@@ -161,33 +187,26 @@ public class LogManager extends SubsystemBase {
     /*
      * Static function - add log entry with all data
      */
-    public static LogEntry addEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix,
-            DoubleSupplier getterDouble, boolean addToNT) {
-        return logManager.add(name, getterPhoenix, getterDouble, addToNT);
-    }
-    /*
-     * Static function - add log entry for status signal with option to add to network table
-     */
-    public static LogEntry addEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix, boolean addToNT) {
-        return logManager.add(name, getterPhoenix, null, addToNT);
+    public static LogEntry addEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix,boolean addToNT, int level) {
+        return logManager.add(name, getterPhoenix, null, addToNT, level);
     }
     /*
      * Static function - add log entry for double supplier with option to add to network table
      */
-    public static LogEntry addEntry(String name, DoubleSupplier getterDouble, boolean addToNT) {
-        return logManager.add(name, null, getterDouble, addToNT);
+    public static LogEntry addEntry(String name, DoubleSupplier getterDouble, boolean addToNT, int level) {
+        return logManager.add(name, null, getterDouble, addToNT, level);
     }
     /*
      * Static function - add log entry for status signal with network table
      */
     public static LogEntry addEntry(String name, Supplier<StatusSignal<Double>> getterPhoenix) {
-        return logManager.add(name, getterPhoenix, null, true);
+        return logManager.add(name, getterPhoenix, null, true, 5);
     }
     /*
      * Static function - add log entry for double supplier with network table
      */
     public static LogEntry addEntry(String name, DoubleSupplier getterDouble) {
-        return logManager.add(name, null, getterDouble, true);
+        return logManager.add(name, null, getterDouble, true, 5);
     }
     /*
      * Static function - get an entry, create if not foune - will see network table is crating new
@@ -240,7 +259,11 @@ public class LogManager extends SubsystemBase {
      * @param values
      */
     public static void log(LogEntry[] entries, double...values) {
-        log(entries,(long)(Timer.getFPGATimestamp()*1000),values);
+        log(entries,time(),values);
+    }
+
+    public static long time() {
+        return (long)(Timer.getFPGATimestamp()*1000);
     }
 
     @Override
