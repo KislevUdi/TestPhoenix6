@@ -6,6 +6,8 @@ package frc.robot.Log;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Log.LogManager.LogEntry;
 
@@ -21,6 +23,8 @@ public class ChassisSpeedsLogger extends LogEntry {
         entries = new LogEntry[] {
             LogManager.getEntry(name + "/vx")
             ,LogManager.getEntry(name + "/vy")
+            ,LogManager.getEntry(name + "/v")
+            ,LogManager.getEntry(name + "/heading")
             ,LogManager.getEntry(name + "/omega")
         };
     }
@@ -30,7 +34,11 @@ public class ChassisSpeedsLogger extends LogEntry {
         if(level < LogManager.logLevel )
             return;
         ChassisSpeeds speeds = supplier.get();
-        LogManager.log(entries,LogManager.time(), speeds.vxMetersPerSecond,speeds.vyMetersPerSecond,speeds.omegaRadiansPerSecond);
+        double x = speeds.vxMetersPerSecond;
+        double y = speeds.vyMetersPerSecond;
+        double v = Math.hypot(x, y);
+        double heading = v>1e-6? Math.toDegrees(Math.atan2(y/v, x/v)):0;
+        LogManager.log(entries,LogManager.time(),x,y,v, heading,speeds.omegaRadiansPerSecond);
     }
 
 } 
